@@ -1,0 +1,25 @@
+{
+  "name": "toko",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.toko.pro",
+    "productName": "Toko Pro",
+    "npmRebuild": false,
+    "win": {
+      "target": "portable"
+    }
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^4.0.3",
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "dependencies": {
+    "mysql2": "^3.22.3"
+  }
+}

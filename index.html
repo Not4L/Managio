@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+    <div id="login-screen" class="login-overlay">
+    <div class="login-box">
+        <div class="logo">Managio</div>
+        <h2>Selamat Datang</h2>
+        <p>Silakan masuk ke akun Anda</p>
+        
+        <div class="input-group-login">
+            <label>Username</label>
+            <input type="text" id="login-username" placeholder="Masukkan username">
+        </div>
+        
+        <div class="input-group-login">
+            <label>Password</label>
+            <input type="password" id="login-password" placeholder="Masukkan password">
+        </div>
+        
+        <button onclick="prosesLogin()" class="btn-login">Masuk ke Sistem</button>
+        <p id="login-error" class="error-msg"></p>
+    </div>
+</div>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="logo">Managio</div>
+            <nav>
+    <button onclick="showPage('dashboard')" id="btn-dashboard" class="active">
+        <i data-lucide="layout-dashboard"></i> Dashboard
+    </button>
+    <button onclick="showPage('kasir')" id="btn-kasir">
+        <i data-lucide="shopping-cart"></i> Kasir
+    </button>
+    <div class="nav-label">Manajemen Barang</div>
+    <button onclick="showPage('stok')" id="btn-stok">
+        <i data-lucide="package"></i> Stok Barang
+    </button>
+    <button onclick="showPage('supplier')" id="btn-supplier">
+        <i data-lucide="truck"></i> Supplier
+    </button>
+    <div class="nav-label">Laporan & Pelanggan</div>
+    <button onclick="showPage('laporan')" id="btn-laporan">
+        <i data-lucide="bar-chart-3"></i> Laporan Penjualan
+    </button>
+    <button onclick="showPage('pelanggan')" id="btn-pelanggan">
+        <i data-lucide="users"></i> Data Pelanggan
+    </button>
+    <div class="nav-spacer"></div>
+</nav>
+        </aside>
+
+        <main class="main-content">
+            <div id="dashboard" class="page active">
+    <div class="header-flex">
+        <h1>Ringkasan Toko</h1>
+        <p id="current-date" style="color: #64748b; font-weight: 500;"></p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="card card-revenue">
+            <div class="card-icon"><i data-lucide="banknote"></i></div>
+            <div class="card-info">
+                <h3>Total Omzet</h3>
+                <p id="dash-uang">Rp 0</p>
+            </div>
+        </div>
+
+        <div class="card card-sold">
+            <div class="card-icon"><i data-lucide="shopping-cart"></i></div>
+            <div class="card-info">
+                <h3>Terjual</h3>
+                <p id="dash-terjual">0</p>
+            </div>
+        </div>
+
+        <div class="card card-items">
+            <div class="card-icon"><i data-lucide="package"></i></div>
+            <div class="card-info">
+                <h3>Jenis Produk</h3>
+                <p id="dash-produk-unik">0</p>
+            </div>
+        </div>
+
+        <div class="card card-warning">
+            <div class="card-icon"><i data-lucide="alert-triangle"></i></div>
+            <div class="card-info">
+                <h3>Stok Menipis</h3>
+                <p id="dash-low-stock">0</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-main-grid">
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3>Total Penjualan (7 Transaksi Terakhir)</h3>
+            </div>
+            <canvas id="salesChart"></canvas>
+        </div>
+
+        <div class="low-stock-list">
+            <h3>Perlu Restok Segera</h3>
+            <ul id="list-low-stock">
+                <li style="color:#94a3b8; font-size: 13px;">Semua stok aman.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+            <div id="kasir" class="page">
+                <h1>Kasir</h1>
+                <div class="input-group">
+    <select id="pilih-barang"></select>
+    <input type="number" id="qty-beli" value="1" min="1" style="width: 80px;">
+    <button onclick="tambahKeKeranjang()" class="btn-primary">Tambah</button>
+</div>
+
+<div class="input-group" style="background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px dashed #cbd5e1; margin-top: 15px;">
+    <label style="margin-right: 15px; font-weight: bold; color: #334155;">
+        <i data-lucide="user-check" style="width: 16px; margin-right: 5px;"></i> Pelanggan:
+    </label>
+    
+    <input type="text" list="list-member" id="in-member" placeholder="Cari nama atau nomor HP..." style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0;">
+    <datalist id="list-member"></datalist>
+</div>
+
+<table class="data-table" style="margin-top: 20px;">
+    <thead><tr><th>Produk</th><th>Qty</th><th>Subtotal</th><th>Aksi</th></tr></thead>
+    <tbody id="tabel-keranjang"></tbody>
+</table>
+<div style="text-align: right; margin-top: 20px;">
+    <button onclick="prosesTransaksi()" class="btn-primary" style="background: #10b981;">Proses Bayar</button>
+</div>
+</div>
+
+
+            <div id="stok" class="page">
+                <h1>Manajemen Stok Gudang</h1>
+                <div class="input-group" id="form-tambah-stok"> 
+    <input type="text" id="in-nama" placeholder="Nama Barang">
+    <input type="number" id="in-stok" placeholder="Stok Awal">
+    <input type="number" id="in-harga-beli" placeholder="Harga Modal (Rp)"> <input type="number" id="in-harga" placeholder="Harga Jual (Rp)">
+    <button onclick="tambahStok()" class="btn-primary">Tambah Barang</button>
+</div>
+                <table class="data-table">
+                    <thead><tr><th>Produk</th><th>Stok</th><th>Harga</th><th>Aksi</th></tr></thead>
+                    <tbody id="tabel-stok"></tbody>
+                </table>
+            </div>
+
+            <div id="supplier" class="page">
+    <h1>Manajemen Supplier</h1>
+    
+    <div class="input-group" id="form-supplier">
+        <input type="text" id="sup-nama" placeholder="Nama Supplier / Perusahaan">
+        <input type="text" id="sup-kontak" placeholder="No. Telp / WhatsApp">
+        <input type="text" id="sup-alamat" placeholder="Alamat Gudang">
+        <button onclick="tambahSupplier()" class="btn-primary">Simpan Supplier</button>
+    </div>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Nama Supplier</th>
+                <th>Kontak</th>
+                <th>Alamat</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody id="tabel-supplier">
+            </tbody>
+    </table>
+</div>
+
+            <div id="laporan" class="page">
+                <h1>Laporan & Riwayat</h1>
+                <div class="input-group">
+                    <span>Filter Hari:</span>
+                    <input type="date" id="filter-tanggal" onchange="filterRiwayat()">
+                    <b style="color:#10b981;">Pendapatan: <span id="total-pendapatan-hari">Rp 0</span></b>
+                </div>
+                <table class="data-table">
+                    <thead><tr><th>Waktu</th><th>Detail Transaksi</th><th>Total</th></tr></thead>
+                    <tbody id="tabel-riwayat"></tbody>
+                </table>
+            </div>
+
+<div id="pelanggan" class="page">
+    <h1>Data Pelanggan & Poin</h1>
+    <div class="input-group">
+        <input type="text" id="in-nama-pelanggan" placeholder="Nama Pelanggan">
+        <input type="text" id="in-telp-pelanggan" placeholder="No. Telepon">
+        <button onclick="tambahPelanggan()" class="btn-primary">Daftarkan Pelanggan</button>
+    </div>
+    <table class="data-table">
+        <thead><tr><th>Nama</th><th>Telepon</th><th>Poin Terkumpul</th><th>Aksi</th></tr></thead>
+        <tbody id="tabel-pelanggan"></tbody>
+    </table>
+</div>
+        </main>
+    </div>
+
+<!-- ═══════════════════════════════════════════════
+     MODAL EDIT PRODUK
+     Tampil saat tombol Edit di tabel diklik
+════════════════════════════════════════════════ -->
+<div id="modal-edit-produk" class="modal-overlay" onclick="tutupModalEdit(event)">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2><i data-lucide="package-open"></i> Edit Produk</h2>
+            <button class="modal-close" onclick="tutupModalEdit()">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="edit-id">
+            <div class="modal-field">
+                <label>Nama Barang</label>
+                <input type="text" id="edit-nama" placeholder="Nama barang">
+            </div>
+            <div class="modal-field">
+                <label>Stok</label>
+                <input type="number" id="edit-stok" placeholder="Jumlah stok" min="0">
+            </div>
+            <div class="modal-field">
+                <label>Harga Modal (Rp)</label>
+                <input type="number" id="edit-harga-beli" placeholder="Harga beli / modal">
+            </div>
+            <div class="modal-field">
+                <label>Harga Jual (Rp)</label>
+                <input type="number" id="edit-harga" placeholder="Harga jual ke pelanggan">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-modal-batal" onclick="tutupModalEdit()">Batal</button>
+            <button class="btn-modal-simpan" onclick="simpanEditProduk()">
+                <i data-lucide="save"></i> Simpan Perubahan
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="./src/renderer.js"></script>
+<script src="./src/inventory.js"></script>
+<script src="./src/pos.js"></script>
+<script src="./src/dashboard.js"></script>
+<script src="./src/auth.js"></script>
+<script src="./src/supplier.js"></script>
+
+<script>
+    lucide.createIcons();
+</script>
+
+</body>
+</html>
